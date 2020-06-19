@@ -1,3 +1,2 @@
-# tizko-api
-# tizko-api
-# tizko-api
+# A RESTful API for Tizko Online Groceries
+
