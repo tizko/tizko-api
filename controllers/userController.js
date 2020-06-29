@@ -38,6 +38,12 @@ async function create(userParam) {
   }
 
   await user.save();
+
+  const token = jwt.sign({ sub: user.id }, config.secret);
+  
+  return { 
+    token 
+  };
 }
 
 async function getAll() {
