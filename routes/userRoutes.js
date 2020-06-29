@@ -27,8 +27,8 @@ function authenticate(req, res, next) {
 function register(req, res, next) {
   userController
     .create(req.body)
-    .then(() => {
-      res.status(201).json({});
+    .then((token) => {
+      res.json(token);
     })
     .catch((err) => next(err));
 }

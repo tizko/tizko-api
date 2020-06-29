@@ -1,0 +1,6 @@
+config/config.json
+_helpers/auth.config.json
+node_modules/**/*
+
+# macOS
+.DS_Store
