@@ -28,7 +28,7 @@ function register(req, res, next) {
   userController
     .create(req.body)
     .then(() => {
-      res.json({});
+      res.status(201).json({});
     })
     .catch((err) => next(err));
 }
