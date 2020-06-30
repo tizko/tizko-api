@@ -1,33 +1,35 @@
-'use strict';
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define(
-    'User',
-    {
-      email: DataTypes.STRING,
-      passwordHash: DataTypes.STRING,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      birthDate: DataTypes.DATEONLY,
-      gender: DataTypes.STRING,
-      contactNumber: DataTypes.STRING,
-      shippingAddress: DataTypes.STRING,
-      billingAddress: DataTypes.STRING,
-    },
-    {}
-  );
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-  //remove id and password in API responses for security reasons
-  User.prototype.toJSON = function () {
-    let values = Object.assign({}, this.get());
+const schema = new Schema({
+  email: { type: String, unique: true, require: true },
+  passwordHash: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  contactNumber: { type: String, required: true },
+  shippingAddress: String,
+  billingAddress: String,
+  acceptTerms: Boolean,
+  role: { type: String, required: true },
+  verificationToken: String,
+  verified: Date,
+  created: { type: Date, default: Date.now },
+  updated: Date,
+});
 
-    //delete values.id;
-    delete values.passwordHash;
-    return values;
-  };
+//will be used in email verification
+schema.virtual('isVerified').get(function () {
+  return !!(this.verified);
+});
 
-  User.associate = function (models) {
-    // associations can be defined here
-  };
+schema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    //remove this props when object is serialized
+    delete ret._id;
+    delete ret.passwordHash;
+  },
+});
 
-  return User;
-};
+module.exports = mongoose.model('User', schema);
