@@ -10,7 +10,8 @@
   "keywords": [
     "nodejs",
     "express",
-    "sequelize"
+    "mongodb",
+    "mongoose"
   ],
   "author": "Patrick Castro",
   "license": "ISC",
@@ -22,10 +23,10 @@
     "express": "^4.17.1",
     "express-jwt": "^5.3.3",
     "jsonwebtoken": "^8.5.1",
-    "mysql2": "^2.1.0",
+    "mongodb": "^3.5.9",
+    "mongoose": "^5.9.20",
     "nodemailer": "^6.4.10",
     "rootpath": "^0.1.2",
-    "sequelize": "^5.21.13",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
   },
