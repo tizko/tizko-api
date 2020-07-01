@@ -8,7 +8,8 @@ const userController = require('../controllers/userController');
 
 //routes
 router.post('/authenticate', authenticateSchema, authenticate);
-// router.post('/register', register);
+router.post('/register', registerSchema, register);
+router.post('/verify-email', verifyEmailSchema, verifyEmail);
 router.post('/', authorize(Role.SuperAdmin), createSchema, create); // create user route for SuperAdmins
 router.get('/', authorize(Role.SuperAdmin), getAll); // indexing all user accounts is only authorized for SuperAdmin users
 router.get('/:id', authorize(), getById);
@@ -39,6 +40,56 @@ function authenticate(req, res, next) {
     .catch(next);
 }
 
+function registerSchema(req, res, next) {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    password: Joi.string()
+      .min(8)
+      .alphanum()
+      .pattern(/^(?=.*[0-9].*[0-9])((?!password).)*$/), // regex ensures that password has atleast 2 numbers and does not contain the word 'password'
+    confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+    role: Joi.string()
+      .valid(Role.Admin, Role.Customer)
+      .empty('')
+      .required(),
+    contactNumber: Joi.string()
+      .pattern(/((^(\+)(\d){12}$)|(^\d{11}$))/) // regex validates ph mobile phone numbers (e.g +639123456789 or 09123456789)
+      .required(),
+  });
+
+  validateRequest(req, next, schema);
+}
+
+function register(req, res, next) {
+  userController
+    .register(req.body, req.get('origin'))
+    .then(() => {
+      res.status(201).json({
+        message:
+          'Registration Succesful, please check your email for Verification instructions.',
+      });
+    })
+    .catch(next);
+}
+
+function verifyEmailSchema(req, res, next) {
+  const schema = Joi.object({
+    token: Joi.string().required()
+  });
+
+  validateRequest(req, next, schema);
+
+}
+
+function verifyEmail(req, res, next) {
+  userController
+    .verifyEmail(req.body)
+    .then(() => res.json({ message: 'Verification successful, you can now Login.' }))
+    .catch(next)
+}
+
 function createSchema(req, res, next) {
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -67,7 +118,7 @@ function create(req, res, next) {
     .then((token) => {
       res.status(201).json(token);
     })
-    .catch((err) => next(err));
+    .catch(next);
 }
 
 function getAll(req, res, next) {
@@ -130,7 +181,6 @@ function update(req, res, next) {
 }
 
 function _delete(req, res, next) {
-
   //users can update their own account and super admins can delete any account
   if (req.params.id !== req.user.id && req.user.role !== Role.SuperAdmin) {
     return res.status(401).json({ message: 'Unauthorized!' });
@@ -138,6 +188,6 @@ function _delete(req, res, next) {
 
   userController
     .delete(req.params.id)
-    .then(() => res.json({ message: 'Account deleted successfully!'}))
+    .then(() => res.json({ message: 'Account deleted successfully!' }))
     .catch(next);
 }

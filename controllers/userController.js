@@ -8,8 +8,8 @@ const Role = require('../_helpers/role');
 
 module.exports = {
   authenticate,
-  // register,
-  // verifyEmail,
+  register,
+  verifyEmail,
   create,
   getAll,
   getById,
@@ -20,7 +20,7 @@ module.exports = {
 async function authenticate({ email, password, ipAddress }) {
   const user = await db.User.findOne({ email });
 
-  if(!user || !bcrypt.compareSync(password, user.passwordHash)) {
+  if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
     throw 'Email or password is incorrect!';
   }
 
@@ -30,32 +30,43 @@ async function authenticate({ email, password, ipAddress }) {
   //return basic details and tokens
   return {
     ...basicDetails(user),
-    jwtToken
-  }
+    jwtToken,
+  };
 }
 
-// async function register(params, origin) {
-//   // validate
-//   if (await db.User.findOne({ email: params.email })) {
-//     // send already registered error in email to prevent account enumeration
-//     return await sendAlreadyRegisteredEmail(params.email, origin);
-//   }
+async function register(params, origin) {
+  // validate
+  if (await db.User.findOne({ email: params.email })) {
+    // send already registered error in email to prevent account enumeration
+    return await sendAlreadyRegisteredEmail(params.email, origin);
+  }
 
-//   // create user account object
-//   const user = new db.User(params);
+  // create user account object
+  const user = new db.User(params);
 
-//   user.verificationToken = randomTokenString();
+  user.verificationToken = randomTokenString();
 
-//   // hash password
-//   if(params.password) {
-//     user.passwordHash = hash(params.password);
-//   }
+  // hash password
+  if (params.password) {
+    user.passwordHash = hash(params.password);
+  }
 
-//   // save account
-//   await user.save();
+  // save account
+  await user.save();
 
-//   await sendVerificationEmail(user, origin);
-// }
+  await sendVerificationEmail(user, origin);
+}
+
+async function verifyEmail({ token }) {
+  const user = await db.User.findOne({ verificationToken: token });
+
+  if (!user) throw 'Verification Failed!';
+
+  user.verified = Date.now();
+  user.verificationToken = undefined;
+
+  await user.save();
+}
 
 async function create(params) {
   // validate
@@ -80,7 +91,7 @@ async function create(params) {
 async function getAll() {
   const users = await db.User.find();
 
-  return users.map(x => basicDetails(x));
+  return users.map((x) => basicDetails(x));
 }
 
 async function getById(id) {
@@ -93,7 +104,10 @@ async function update(id, params) {
   const user = await getUser(id);
 
   //validated
-  if(user.email !== params.email && await db.User.findOne({ email: params.email })) {
+  if (
+    user.email !== params.email &&
+    (await db.User.findOne({ email: params.email }))
+  ) {
     throw 'Email "' + params.email + '" is already taken!';
   }
 
@@ -120,12 +134,12 @@ async function _delete(id) {
 // helper functions
 
 async function getUser(id) {
-  if(!db.isValidId(id)) throw 'User Account not found!';
-  
+  if (!db.isValidId(id)) throw 'User Account not found!';
+
   const user = await db.User.findById(id);
-  
-  if(!user) throw 'User Account not found!'
-  
+
+  if (!user) throw 'User Account not found!';
+
   return user;
 }
 
@@ -135,7 +149,9 @@ function hash(password) {
 
 function generateJwtToken(user) {
   // create a jwt token containing the user account id that expires in 15 mins
-  return jwt.sign({ sub: user.id, id: user.id }, config.secret, { expiresIn: '15m'});
+  return jwt.sign({ sub: user.id, id: user.id }, config.secret, {
+    expiresIn: '15m',
+  });
 }
 
 function randomTokenString() {
@@ -143,6 +159,69 @@ function randomTokenString() {
 }
 
 function basicDetails(user) {
-  const { id, firstName, lastName, email, contactNumber, shippingAddress, billingAddress, role, created, updated, isVerified } = user;
-  return { id, firstName, lastName, email, role, contactNumber, shippingAddress, billingAddress, created, updated, isVerified };
+  const {
+    id,
+    firstName,
+    lastName,
+    email,
+    contactNumber,
+    shippingAddress,
+    billingAddress,
+    role,
+    created,
+    updated,
+    isVerified,
+  } = user;
+  return {
+    id,
+    firstName,
+    lastName,
+    email,
+    role,
+    contactNumber,
+    shippingAddress,
+    billingAddress,
+    created,
+    updated,
+    isVerified,
+  };
+}
+
+async function sendVerificationEmail(user, origin) {
+  let message;
+  if (origin) {
+    const verifyUrl = `$${origin}/user/verify-email?token=${user.verificationToken}`;
+    message = `<p>Please click the below link to verify your email address:</p>
+               <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
+    console.log(verifyUrl);
+  } else {
+    message = `<p>Please use the below token to verify your email address with the <code>/user/verify-email</code> api route:</p>
+               <p><code>${user.verificationToken}</code></p>`;
+  }
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Tizko - Please Verify your Email',
+    html: `<h4>Verify Email</h4>
+           <p>Thanks for Signing up!</p>
+           ${message}`,
+  });
+}
+
+async function sendAlreadyRegisteredEmail(email, origin) {
+  let message;
+  if (origin) {
+    message = `<p>Someone is trying to Sign up using your email address.</p>
+               <p>Please contact us IMMEDIETELY if this was NOT you.</p>`;
+  } else {
+    message = `<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>`;
+  }
+
+  await sendEmail({
+    to: email,
+    subject: `Tizko - Email Already Registered`,
+    html: `<h4>Email Already Registered</h4>
+           <p>Your email <strong>${email}</strong> is already registered.</p>
+           ${message}`,
+  });
 }
