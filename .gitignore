@@ -3,6 +3,7 @@ node_modules/**/*
 
 # config files
 config/**
+_helpers/auth.config.json
 
 # macOS
 .DS_Store
