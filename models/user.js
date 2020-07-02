@@ -7,6 +7,7 @@ const schema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   contactNumber: { type: String, required: true },
+  acceptTerms: { type: Boolean, required: true },
   shippingAddress: String,
   billingAddress: String,
   acceptTerms: Boolean,
@@ -19,7 +20,7 @@ const schema = new Schema({
 
 //will be used in email verification
 schema.virtual('isVerified').get(function () {
-  return !!(this.verified);
+  return !!this.verified;
 });
 
 schema.set('toJSON', {
