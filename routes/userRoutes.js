@@ -38,7 +38,7 @@ function authenticate(req, res, next) {
       setTokenCookie(res, refreshToken);
       res.json(user);
     })
-    .catch();
+    .catch(next);
 }
 
 function refreshToken(req, res, next) {

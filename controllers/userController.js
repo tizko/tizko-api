@@ -6,6 +6,7 @@ const sendEmail = require('../_helpers/send-email');
 const db = require('../_helpers/db.connection');
 const Role = require('../_helpers/role');
 
+
 module.exports = {
   authenticate,
   refreshToken,
@@ -21,7 +22,7 @@ module.exports = {
 async function authenticate({ email, password, ipAddress }) {
   const user = await db.User.findOne({ email });
 
-  if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
+  if (!user || !user.isVerified || !bcrypt.compareSync(password, user.passwordHash)) {
     throw 'Email or password is incorrect!';
   }
 
