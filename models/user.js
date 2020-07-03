@@ -10,7 +10,6 @@ const schema = new Schema({
   acceptTerms: { type: Boolean, required: true },
   shippingAddress: String,
   billingAddress: String,
-  acceptTerms: Boolean,
   role: { type: String, required: true },
   verificationToken: String,
   verified: Date,
