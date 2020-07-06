@@ -3,10 +3,12 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const errorHandler = require('./_middlewares/error-handler');
+const cookieParser = require('cookie-parser');
+const errorHandler = require('./middlewares/error-handler');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 // allow cors requests from any origin and with credentials
 app.use(
   cors({
@@ -17,7 +19,7 @@ app.use(
 
 //api routes
 app.use('/users', require('./routes/userRoutes'));
-// app.use('/products', require('./routes/productRoutes'));
+app.use('/products', require('./routes/productRoutes'));
 
 //global error handler passed as a middleware
 app.use(errorHandler);

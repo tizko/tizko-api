@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('@hapi/joi');
-const validateRequest = require('../_middlewares/validate-request');
-const authorize = require('../_middlewares/authorize');
+const validateRequest = require('../middlewares/validate-request');
+const authorize = require('../middlewares/authorize');
 const Role = require('../_helpers/role');
 const userController = require('../controllers/userController');
 
 //routes
 router.post('/authenticate', authenticateSchema, authenticate);
+router.post('/refresh-token', refreshToken);
 router.post('/register', registerSchema, register);
 router.post('/verify-email', verifyEmailSchema, verifyEmail);
 router.post('/', authorize(Role.SuperAdmin), createSchema, create); // create user route for SuperAdmins
@@ -30,11 +31,24 @@ function authenticateSchema(req, res, next) {
 function authenticate(req, res, next) {
   const { email, password } = req.body;
   const ipAddress = req.ip;
-  // console.log(ipAddress);
 
   userController
     .authenticate({ email, password, ipAddress })
-    .then(({ ...user }) => {
+    .then(({ refreshToken, ...user }) => {
+      setTokenCookie(res, refreshToken);
+      res.json(user);
+    })
+    .catch(next);
+}
+
+function refreshToken(req, res, next) {
+  const token = req.cookies.refreshToken;
+  const ipAddress = req.ip;
+
+  userController
+    .refreshToken({ token, ipAddress })
+    .then(({ refreshToken, ...user }) => {
+      setTokenCookie(res, refreshToken);
       res.json(user);
     })
     .catch(next);
@@ -50,13 +64,11 @@ function registerSchema(req, res, next) {
       .alphanum()
       .pattern(/^(?=.*[0-9].*[0-9])((?!password).)*$/), // regex ensures that password has atleast 2 numbers and does not contain the word 'password'
     confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
-    role: Joi.string()
-      .valid(Role.Admin, Role.Customer)
-      .empty('')
-      .required(),
+    role: Joi.string().valid(Role.Admin, Role.Customer).empty('').required(),
     contactNumber: Joi.string()
       .pattern(/((^(\+)(\d){12}$)|(^\d{11}$))/) // regex validates ph mobile phone numbers (e.g +639123456789 or 09123456789)
       .required(),
+    acceptTerms: Joi.boolean().required(),
   });
 
   validateRequest(req, next, schema);
@@ -76,18 +88,19 @@ function register(req, res, next) {
 
 function verifyEmailSchema(req, res, next) {
   const schema = Joi.object({
-    token: Joi.string().required()
+    token: Joi.string().required(),
   });
 
   validateRequest(req, next, schema);
-
 }
 
 function verifyEmail(req, res, next) {
   userController
     .verifyEmail(req.body)
-    .then(() => res.json({ message: 'Verification successful, you can now Login.' }))
-    .catch(next)
+    .then(() =>
+      res.json({ message: 'Verification successful, you can now Login.' })
+    )
+    .catch(next);
 }
 
 function createSchema(req, res, next) {
@@ -190,4 +203,16 @@ function _delete(req, res, next) {
     .delete(req.params.id)
     .then(() => res.json({ message: 'Account deleted successfully!' }))
     .catch(next);
+}
+
+//helper functions
+
+function setTokenCookie(res, token) {
+  //create cookie with refresh token that expires in 7 days
+  const cookieOptions = {
+    httpOnly: true,
+    expires: new Date(Date.now() + 7 + 24 * 60 * 60 * 1000),
+  };
+
+  res.cookie('refreshToken', token, cookieOptions);
 }
