@@ -1,5 +1,4 @@
 const db = require('../_helpers/db.connection');
-const product = require('../models/product');
 
 module.exports = {
   getAll,
@@ -34,9 +33,26 @@ async function create(params) {
   return basicDetails(product);
 }
 
-async function update(id, params) {}
+async function update(id, params) {
+  const product = await getProduct(id);
+  console.log(product)
+  if (product.sku !== params.sku && (await db.Product.findOne({ sku: params.sku }))) {
+    throw 'Product with SKU of"' + params.sku + '" already exist!';
+  }
 
-async function _delete(id) {}
+  Object.assign(product, params);
+  product.updated = Date.now();
+
+  await product.save();
+
+  return basicDetails(product);
+}
+
+async function _delete(id) {
+  const product = await getProduct(id);
+
+  await product.remove();
+}
 
 //helper functions
 
