@@ -6,12 +6,15 @@ const sendEmail = require('../_helpers/send-email');
 const db = require('../_helpers/db.connection');
 const Role = require('../_helpers/role');
 
-
 module.exports = {
   authenticate,
   refreshToken,
+  revokeToken,
   register,
   verifyEmail,
+  forgotPassword,
+  // validateResetToken,
+  resetPassword,
   create,
   getAll,
   getById,
@@ -22,7 +25,11 @@ module.exports = {
 async function authenticate({ email, password, ipAddress }) {
   const user = await db.User.findOne({ email });
 
-  if (!user || !user.isVerified || !bcrypt.compareSync(password, user.passwordHash)) {
+  if (
+    !user ||
+    !user.isVerified ||
+    !bcrypt.compareSync(password, user.passwordHash)
+  ) {
     throw 'Email or password is incorrect!';
   }
 
@@ -58,15 +65,21 @@ async function refreshToken({ token, ipAddress }) {
   //generate new jwt
   const jwtToken = generateJwtToken(user);
 
-
   //return basic details and tokens
   return {
     ...basicDetails(user),
     jwtToken,
     refreshToken: newRefreshToken.token,
   };
-  
-  
+}
+
+async function revokeToken({ token, ipAddress }) {
+  const refreshToken = await getRefreshToken(token);
+
+  // revoke and save
+  refreshToken.revoked = Date.now();
+  refreshToken.revokeByIp = ipAddress;
+  await refreshToken.save();
 }
 
 async function register(params, origin) {
@@ -99,6 +112,49 @@ async function verifyEmail({ token }) {
 
   user.verified = Date.now();
   user.verificationToken = undefined;
+
+  await user.save();
+}
+
+async function forgotPassword({ email }, origin) {
+  const user = await db.User.findOne({ email });
+
+  // always return ok response to prevent email enumeration
+  if (!user) return;
+
+  // create reset token that expires after 24hrs
+  user.resetToken = {
+    token: randomTokenString(),
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  };
+
+  await user.save();
+
+  // send email
+  await sendPasswordResetEmail(user, origin);
+}
+
+// async function validateResetToken({ token }) {
+//   const user = await db.User.findOne({
+//     'resetToken.token': token,
+//     'resetToken.expires': { $gt: Date.now() },
+//   });
+
+//   if (!user) throw 'Invalid token!';
+// }
+
+async function resetPassword({ token, password }) {
+  const user = await db.User.findOne({
+    'resetToken.token': token,
+    'resetToken.expires': { $gt: Date.now() },
+  });
+
+  if (!user) throw 'Invalid token!';
+
+  //update password and remove reset token
+  user.passwordHash = hash(password);
+  user.passwordReset = Date.now();
+  user.resetToken = undefined;
 
   await user.save();
 }
@@ -278,6 +334,25 @@ async function sendAlreadyRegisteredEmail(email, origin) {
     subject: `Tizko - Email Already Registered`,
     html: `<h4>Email Already Registered</h4>
            <p>Your email <strong>${email}</strong> is already registered.</p>
+           ${message}`,
+  });
+}
+
+async function sendPasswordResetEmail(user, origin) {
+  let message;
+  if (origin) {
+    const resetUrl = `${origin}/users/reset-password?token=${user.resetToken.token}`;
+    message = `<p>Please click the below lin to reset your password, the link will be valid for 1 day:</p>
+               <p><a href="${resetUrl}">${resetUrl}</a></p>`;
+  } else {
+    message = `<p>Please use the below token to reset your password with the <code>/users/reset-password</code> api route:</p>
+               <p><code><strong>${user.resetToken.token}</strong></code></p>`;
+  }
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Tizko - Reset Password',
+    html: `<h4>Reset Password Email</h4>
            ${message}`,
   });
 }

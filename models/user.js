@@ -13,13 +13,18 @@ const schema = new Schema({
   role: { type: String, required: true },
   verificationToken: String,
   verified: Date,
+  resetToken: {
+    token: String,
+    expires: Date
+  },
+  passwordReset: Date,
   created: { type: Date, default: Date.now },
   updated: Date,
 });
 
 //will be used in email verification
 schema.virtual('isVerified').get(function () {
-  return !!this.verified;
+  return !!(this.verified || this.passwordReset);
 });
 
 schema.set('toJSON', {

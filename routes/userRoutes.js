@@ -9,8 +9,11 @@ const userController = require('../controllers/userController');
 //routes
 router.post('/authenticate', authenticateSchema, authenticate);
 router.post('/refresh-token', refreshToken);
+router.post('/revoke-token', authorize(), revokeTokenSchema, revokeToken);
 router.post('/register', registerSchema, register);
 router.post('/verify-email', verifyEmailSchema, verifyEmail);
+router.post('/forgot-password', forgotPasswordSchema, forgotPassword);
+router.post('/reset-password', resetPasswordSchema, resetPassword);
 router.post('/', authorize(Role.SuperAdmin), createSchema, create); // create user route for SuperAdmins
 router.get('/', authorize(Role.SuperAdmin), getAll); // indexing all user accounts is only authorized for SuperAdmin users
 router.get('/:id', authorize(), getById);
@@ -51,6 +54,31 @@ function refreshToken(req, res, next) {
       setTokenCookie(res, refreshToken);
       res.json(user);
     })
+    .catch(next);
+}
+
+function revokeTokenSchema(req, res, next) {
+  const schema = Joi.object({
+    token: Joi.string().empty(''),
+  });
+  validateRequest(req, next, schema);
+}
+
+function revokeToken(req, res, next) {
+  // accept token from request body or cookie
+  const token = req.body.token || req.cookies.refreshToken;
+  const ipAddress = req.ip;
+
+  if (!token) return res.status(400).json({ message: 'Token is required!' });
+
+  // users can revoke their own tokens and super admins can revoke any tokens
+  if (!req.user.ownsToken(token) && req.user.role !== Role.SuperAdmin) {
+    return res.status(401).json({ message: 'Unauthorized!' });
+  }
+
+  userController
+    .revokeToken({ token, ipAddress })
+    .then(() => res.json({ message: 'Token revoked!' }))
     .catch(next);
 }
 
@@ -99,6 +127,42 @@ function verifyEmail(req, res, next) {
     .verifyEmail(req.body)
     .then(() =>
       res.json({ message: 'Verification successful, you can now Login.' })
+    )
+    .catch(next);
+}
+
+function forgotPasswordSchema(req, res, next) {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+  });
+  validateRequest(req, next, schema);
+}
+
+function forgotPassword(req, res, next) {
+  userController
+    .forgotPassword(req.body, req.get('origin'))
+    .then(() =>
+      res.json({
+        message: 'Please check your email for password reset instructions',
+      })
+    )
+    .catch(next);
+}
+
+function resetPasswordSchema(req, res, next) {
+  const schema = Joi.object({
+    token: Joi.string().required(),
+    password: Joi.string().required(),
+    confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+  });
+  validateRequest(req, next, schema);
+}
+
+function resetPassword(req, res, next) {
+  userController
+    .resetPassword(req.body)
+    .then(() =>
+      res.json({ message: 'Password reset successful, you can now login.' })
     )
     .catch(next);
 }
