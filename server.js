@@ -22,6 +22,9 @@ app.use('/users', require('./routes/userRoutes'));
 app.use('/products', require('./routes/productRoutes'));
 app.use('/stores', require('./routes/storeRoutes'));
 
+//swagger docs route
+app.use('/docs', require('_helpers/swagger'));
+
 //global error handler passed as a middleware
 app.use(errorHandler);
 
