@@ -21,7 +21,7 @@ async function getById(id) {
 }
 
 async function create(params) {
-  // validate if product already exist
+  // might have to refactor the validation
   if (await db.Product.findOne({ sku: params.sku })) {
     throw 'Product with SKU of "' + params.sku + '" already exist!';
   }
@@ -35,7 +35,7 @@ async function create(params) {
 
 async function update(id, params) {
   const product = await getProduct(id);
-  console.log(product)
+  // might have to refactor the validation
   if (product.sku !== params.sku && (await db.Product.findOne({ sku: params.sku }))) {
     throw 'Product with SKU of"' + params.sku + '" already exist!';
   }
@@ -55,7 +55,6 @@ async function _delete(id) {
 }
 
 //helper functions
-
 function basicDetails(product) {
   const {
     id,

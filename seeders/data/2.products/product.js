@@ -15,10 +15,11 @@ for (let i = 0; i < 10; i++) {
     category: faker.commerce.productMaterial(),
     stock: faker.random.number(),
     created: faker.date.past(),
-    updated: faker.date.recent()
-  }
+    updated: faker.date.recent(),
+  };
 
-  data.push(product);
+  // data.push(product);
+  data = [...data, product];
 }
 
 module.exports = data;

@@ -20,6 +20,7 @@ app.use(
 //api routes
 app.use('/users', require('./routes/userRoutes'));
 app.use('/products', require('./routes/productRoutes'));
+app.use('/stores', require('./routes/storeRoutes'));
 
 //global error handler passed as a middleware
 app.use(errorHandler);
