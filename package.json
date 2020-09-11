@@ -4,8 +4,8 @@
   "description": "A RESTful API for Tizko Online Groceries",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon ./server.js",
-    "start:dev": "nodemon ./server.js",
+    "start": "NODE_ENV=production node ./server.js",
+    "dev": "NODE_ENV=development nodemon ./server.js",
     "seed": "node ./seeders/seed.js"
   },
   "keywords": [
@@ -20,13 +20,16 @@
     "@hapi/joi": "^17.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
+    "dotenv-safe": "^8.2.0",
     "express": "^4.17.1",
     "express-jwt": "^5.3.3",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.20",
+    "morgan": "^1.10.0",
     "nodemailer": "^6.4.10",
     "rootpath": "^0.1.2",
     "swagger-ui-express": "^4.1.4",

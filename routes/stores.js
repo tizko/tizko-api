@@ -3,8 +3,8 @@ const router = express.Router();
 const Joi = require('@hapi/joi');
 const validateRequest = require('../middlewares/validate-request');
 const authorize = require('../middlewares/authorize');
-const Role = require('../_helpers/role');
-const storeController = require('../controllers/storeController');
+const Role = require('../utils/role');
+const storeController = require('../controllers/store');
 
 //routes
 router.get('/', authorize(), getStores);

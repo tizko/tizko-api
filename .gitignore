@@ -4,5 +4,8 @@ node_modules/**/*
 # config files
 config/**
 
+# .env file
+.env
+
 # macOS
 .DS_Store

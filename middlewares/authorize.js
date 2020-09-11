@@ -1,8 +1,10 @@
 const expressJwt = require('express-jwt');
-const { secret } = require('../config/auth.config');
-const db = require('../_helpers/db.connection');
+// const { secret } = require('../config/auth.config');
+const db = require('../utils/db.connection');
 
 module.exports = authorize;
+
+const secret = process.env.JWT_SECRET;
 
 function authorize(roles = []) {
   // roles param can be a single role string (e.g Role.Admin or 'Admin')

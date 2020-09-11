@@ -6,12 +6,20 @@ const schema = new Schema({
   description: { type: String, required: true },
   image: { type: String, required: true },
   location: { type: String, required: true },
+  admins: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+  products: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+  ],
   created: { type: Date, default: Date.now },
   updated: Date,
-  products: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Product'
-  }],
 });
 
 module.exports = mongoose.model('Store', schema);

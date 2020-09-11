@@ -3,11 +3,11 @@ const router = express.Router();
 const Joi = require('@hapi/joi');
 const validateRequest = require('../middlewares/validate-request');
 const authorize = require('../middlewares/authorize');
-const Role = require('../_helpers/role');
-const productController = require('../controllers/productController');
+const Role = require('../utils/role');
+const productController = require('../controllers/product');
 
 //routes
-router.post('/', authorize(Role.Admin), createSchema, createProduct);
+router.post('/', authorize(), createSchema, createProduct);
 router.get('/all', authorize(), listProducts);
 router.get('/:id', authorize(), getProduct);
 router.put('/:id', authorize(), updateSchema, updateProduct);

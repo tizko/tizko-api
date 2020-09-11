@@ -3,8 +3,8 @@ const router = express.Router();
 const Joi = require('@hapi/joi');
 const validateRequest = require('../middlewares/validate-request');
 const authorize = require('../middlewares/authorize');
-const Role = require('../_helpers/role');
-const userController = require('../controllers/userController');
+const Role = require('../utils/role');
+const userController = require('../controllers/user');
 
 //routes
 router.post('/authenticate', authenticateSchema, authenticate);
@@ -47,6 +47,7 @@ function authenticate(req, res, next) {
 function refreshToken(req, res, next) {
   const token = req.cookies.refreshToken;
   const ipAddress = req.ip;
+  console.log(req)
 
   userController
     .refreshToken({ token, ipAddress })

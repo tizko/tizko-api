@@ -1,4 +1,4 @@
-const db = require('../_helpers/db.connection');
+const db = require('../utils/db.connection');
 
 module.exports = {
   getAll,
