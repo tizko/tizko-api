@@ -28,12 +28,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 //api routes
-app.use('/users', require('./routes/users'));
-app.use('/products', require('./routes/products'));
-app.use('/stores', require('./routes/stores'));
+app.use('/api/v1/users', require('./routes/users'));
+app.use('/api/v1/products', require('./routes/products'));
+app.use('/api/v1/stores', require('./routes/stores'));
 
 //swagger docs route
-app.use('/docs', require('utils/swagger'));
+app.use('/api/v1/docs', require('utils/swagger'));
 
 //global error handler passed as a middleware
 app.use(errorHandler);
