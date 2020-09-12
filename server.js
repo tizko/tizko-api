@@ -1,7 +1,7 @@
 require('rootpath')();
-require('dotenv-safe').config();
+const path = require('path');
+const dotenv = require('dotenv-safe');
 const express = require('express');
-const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
 const app = express();
@@ -10,7 +10,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error-handler');
 
-// dotenv.config({ path: './config/config.env' });
+dotenv.config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`)});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

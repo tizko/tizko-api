@@ -4,8 +4,9 @@
   "description": "A RESTful API for Tizko Online Groceries",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_ENV=production node ./server.js",
-    "dev": "NODE_ENV=development nodemon ./server.js",
+    "start": "node ./server.js",
+    "dev": "cross-env NODE_ENV=development nodemon ./server.js",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=10000",
     "seed": "node ./seeders/seed.js"
   },
   "keywords": [
@@ -36,8 +37,17 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.2",
     "faker": "^4.1.0",
+    "jest": "^26.4.2",
     "mongo-seeding": "^3.4.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
