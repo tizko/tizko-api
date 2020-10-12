@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const Joi = require('@hapi/joi');
 const validateRequest = require('../middlewares/validate-request');
 const authorize = require('../middlewares/authorize');
@@ -8,7 +8,7 @@ const productController = require('../controllers/product');
 
 //routes
 router.post('/', authorize(), createSchema, createProduct);
-router.get('/all', authorize(), listProducts);
+router.get('/', authorize(), listProducts);
 router.get('/:id', authorize(), getProduct);
 router.put('/:id', authorize(), updateSchema, updateProduct);
 router.delete('/:id', authorize(), _deleteProduct);
@@ -33,16 +33,17 @@ function createProduct(req, res, next) {
   productController
     .create(req.body)
     .then((product) => {
-      res.status(201).json(product);
+      res.status(201).json({ success: true, data: product });
     })
     .catch(next);
 }
 
 function listProducts(req, res, next) {
+  console.log(req.params);
   productController
-    .getAll()
+    .getAll(req.params.storeId)
     .then((products) => {
-      res.json(products);
+      res.json({ success: true, count: products.length, data: products });
     })
     .catch(next);
 }
@@ -50,7 +51,11 @@ function listProducts(req, res, next) {
 function getProduct(req, res, next) {
   productController
     .getById(req.params.id)
-    .then((product) => (product ? res.json(product) : res.sendStatus(404)))
+    .then((product) =>
+      product
+        ? res.json({ success: true, data: products })
+        : res.sendStatus(404)
+    )
     .catch(next);
 }
 
@@ -77,7 +82,7 @@ function updateProduct(req, res, next) {
   productController
     .update(req.params.id, req.body)
     .then((product) => {
-      res.json(product);
+      res.json({ success: true, data: product });
     })
     .catch(next);
 }
@@ -90,6 +95,8 @@ function _deleteProduct(req, res, next) {
 
   productController
     .delete(req.params.id)
-    .then(() => res.json({ message: 'Product deleted successfully!' }))
+    .then(() =>
+      res.json({ success: true, message: 'Product deleted successfully!' })
+    )
     .catch(next);
 }

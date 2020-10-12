@@ -5,17 +5,12 @@ const schema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   image: { type: String, required: true },
+  contactNumber: { type: String, required: true },
   location: { type: String, required: true },
   admins: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
-    },
-  ],
-  products: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Product',
     },
   ],
   created: { type: Date, default: Date.now },

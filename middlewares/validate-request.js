@@ -1,6 +1,6 @@
-module.exports = validateRequest;
+const ErrorResponse = require('../utils/errorResponse');
 
-function validateRequest(req, next, schema) {
+const validateRequest = (req, next, schema) => {
   const options = {
     aborEarly: false, // include all errors
     allowUnknown: true, // ignore unknown props
@@ -10,9 +10,12 @@ function validateRequest(req, next, schema) {
   const { error, value } = schema.validate(req.body, options);
 
   if(error) {
-    next(`Validation error: ${error.details.map(x => x.message).join(', ')}`);
+    const message = `Validation error: ${error.details.map(x => x.message).join(', ')}`;
+    next(new ErrorResponse(message, 400));
   } else {
     req.body = value;
     next();
   }
 }
+
+module.exports = validateRequest;

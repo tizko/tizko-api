@@ -6,6 +6,12 @@ const authorize = require('../middlewares/authorize');
 const Role = require('../utils/role');
 const storeController = require('../controllers/store');
 
+//include other resource routers
+const productRouter = require('../routes/products');
+
+//re-route into other resource routers
+router.use('/:storeId/products', productRouter);
+
 //routes
 router.get('/', authorize(), getStores);
 router.get('/:id', authorize(), getStore);

@@ -56,9 +56,9 @@ async function _delete(id) {
 
 //helper functions
 function basicDetails(store) {
-  const { id, name, description, image, location, products } = store;
+  const { id, name, description, image, location } = store;
 
-  return { id, name, description, image, location, products };
+  return { id, name, description, image, location};
 }
 
 async function getStore(id) {

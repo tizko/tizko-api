@@ -1,3 +1,4 @@
+const { remove } = require('../models/User');
 const db = require('../utils/db.connection');
 
 module.exports = {
@@ -8,8 +9,14 @@ module.exports = {
   delete: _delete,
 };
 
-async function getAll() {
-  const products = await db.Product.find();
+async function getAll(params) {
+  let products;
+
+  if(params) {
+    products = await db.Product.find({ store: params });
+  } else {
+    products = await db.Product.find();
+  }
 
   return products.map((x) => basicDetails(x));
 }
