@@ -9,13 +9,13 @@ exports.getStores = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  const stores = await db.Store.find();
+  res.status(200).json(res.advancedResults);
 
-  res.status(200).json({
-    success: true,
-    count: stores.length,
-    data: stores.map((x) => basicDetails(x)),
-  });
+  // res.status(200).json({
+  //   success: true,
+  //   count: stores.length,
+  //   data: stores,
+  // });
 });
 
 exports.getStore = asyncHandler(async (req, res, next) => {

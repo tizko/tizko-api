@@ -27,11 +27,10 @@ const advancedResults = (model, populate) => async (req, res, next) => {
 
   // Sort
   if (req.query.sort) {
-    console.log(req.query);
     const sortBy = req.query.sort.split(',').join(' ');
     query = query.sort(sortBy);
   } else {
-    query = query.sort('-createdAt');
+    query = query.sort('-updated');
   }
 
   // Pagination

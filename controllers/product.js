@@ -3,104 +3,28 @@ const Role = require('../utils/role');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 
-exports.getAll = asyncHandler(async (req, res, next) => {
-  let query;
-
-  // Copy req.query
-  const reqQuery = { ...req.query };
-
-  // Fields to exclude
-  const removeFields = ['select', 'sort', 'page', 'limit'];
-
-  // Loop over removeFields and delete them from reqQuery
-  removeFields.forEach(param => delete reqQuery[param]);
-
-  // Create query string
-  let queryStr = JSON.stringify(reqQuery);
-
-  // Create operators ($gt, $gte, etc)
-  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-  // Finding resource
-  query = db.Product.find(JSON.parse(queryStr));
-
-  // Select Fields
-  if (req.query.select) {
-    const fields = req.query.select.split(',').join(' ');
-    query = query.select(fields);
-  }
-
-  // Sort
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(',').join(' ');
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort('-updated');
-  }
-
-  // Pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 25;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const total = await db.Product.countDocuments(JSON.parse(queryStr));
-
-  query = query.skip(startIndex).limit(limit);
-
-  const products = await query;
-
-  // Pagination result
-  const pagination = {};
-
-  if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit
-    };
-  }
-
-  if (startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit
-    };
-  }
-
-  // if (req.params) {
-  //   products = await db.Product.find();
-  // } else {
-  //   products = await db.Product.find();
-  // }
-
-  res.status(200).json({
-    success: true,
-    count: products.length,
-    pagination,
-    data: products.map((x) => basicDetails(x))
-  })
-});
-
 exports.getProducts = asyncHandler(async (req, res, next) => {
-  let query;
 
   if (req.params.storeId) {
-    query = await db.Product.find({ store: req.params.storeId });
+    //TO DO: add paginations IF listing products of a store
+    const products = await db.Product.find({ store: req.params.storeId });
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products
+    });
   } else {
-    query = await db.Product.find();
+    res.status(200).json(res.advancedResults);
   }
-
-  const products = await query;
-
-  res.status(200).json({
-    success: true,
-    count: products.length,
-    data: products.map((x) => basicDetails(x))
-  });
 
 });
 
 exports.getProduct = asyncHandler(async (req, res, next) => {
-  const product = await db.Product.findById(req.params.id);
+  const product = await db.Product.findById(req.params.id).populate({
+    path: 'store',
+    select: 'name description'
+  });
 
   if (!product) {
     return next(new ErrorResponse(`Product with id of ${req.params.id} is not found!`, 404));
@@ -109,12 +33,15 @@ exports.getProduct = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: product
-  })
+  });
+
 });
 
 exports.createProduct = asyncHandler(async (req, res, next) => {
-  // might have to refactor the validation
   // TO DO: only admins of a store will be able to create a product
+  
+
+  // might have to refactor the validation
   if (await db.Product.findOne({ sku: req.body.sku })) {
     return next(new ErrorResponse(`Product with SKU of ${req.body.sku} already exist`, 400));
   }
@@ -186,6 +113,7 @@ function basicDetails(product) {
     price,
     weight,
     category,
+    store,
     created,
     updated,
     inStock,
@@ -200,6 +128,7 @@ function basicDetails(product) {
     price,
     weight,
     category,
+    store,
     created,
     updated,
     inStock,

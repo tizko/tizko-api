@@ -1,89 +1,125 @@
 const db = require('../utils/db.connection');
 const bcrypt = require('bcryptjs');
+const Role = require('../utils/role');
+const asyncHandler = require('../middlewares/async');
+const ErrorResponse = require('../utils/errorResponse');
 
-module.exports = {
-  create,
-  getAll,
-  getById,
-  update,
-  delete: _delete,
-};
-
-async function create(params) {
-  // validate
-  if (await db.User.findOne({ email: params.email })) {
-    throw 'Email "' + params.email + '" is already registerd!';
+exports.createUser = asyncHandler(async(req, res, next) => {
+  // only user with the role of SuperAdmin can create users
+  if (req.user.role !== Role.SuperAdmin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  const user = new db.User(params);
+  //check if user already exists
+  if (await db.User.findOne({ email: req.body.email })) {
+    return next(new ErrorResponse('User already exist!'));
+  }
+
+  const user = new db.User(req.body);
   user.verified = Date.now();
 
-  // hash password
-  if (params.password) {
-    user.passwordHash = hash(params.password);
-  }
+  user.passwordHash = hash(req.body.password);
 
-  // save user account
   await user.save();
 
-  return basicDetails(user);
-}
+  res.status(201).json({
+    success: true,
+    data: basicDetails(user)
+  });
 
-async function getAll() {
+});
+
+exports.getUsers = asyncHandler(async (req, res, next) => {
+  // only user with role of SuperAdmin can list all users
+  if (req.user.role !== Role.SuperAdmin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
   const users = await db.User.find();
 
-  return users.map((x) => basicDetails(x));
-}
+  res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users.map((x) => basicDetails(x))
+  });
 
-async function getById(id) {
-  const user = await getUser(id);
+});
 
-  return basicDetails(user);
-}
+exports.getUser = asyncHandler(async (req, res, next) => {
+  //users can get their own account and SuperAdmins can get any account
+  if (req.params.id !== req.user.id && req.user.role !== Role.SuperAdmin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
 
-async function update(id, params) {
-  const user = await getUser(id);
+  const user = await db.User.findById(req.params.id);
+
+  if (!user) {
+    return next(new ErrorResponse('User not found!', 4040));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: basicDetails(user)
+  });
+
+});
+
+exports.updateUser = asyncHandler(async (req, res, next) => {
+  //users can update their own account and super admins can update any account
+  if (req.params.id !== req.user.id && req.user.role !== Role.SuperAdmin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
+  const user = await db.User.findById(req.params.id);
 
   //validated
   if (
-    user.email !== params.email &&
-    (await db.User.findOne({ email: params.email }))
+    user.email !== req.body.email &&
+    (await db.User.findOne({ email: req.body.email }))
   ) {
-    throw 'Email "' + params.email + '" is already taken!';
+    return next(new ErrorResponse(`Email ${req.body.email} is already taken!`, 400));
   }
 
   //hash password if it was entered
-  if (params.password) {
-    params.passwordHash = hash(params.password);
+  if (req.body.password) {
+    req.body.passwordHash = hash(req.body.password);
   }
 
   // copy params to user and save
-  Object.assign(user, params);
+  Object.assign(user, req.body);
   user.updated = Date.now();
 
   await user.save();
 
-  return basicDetails(user);
-}
+  res.status(200).json({
+    success: true,
+    data: basicDetails(user)
+  });
 
-async function _delete(id) {
-  const user = await getUser(id);
+});
+
+exports.deleteUser = asyncHandler(async (req, res, next) => {
+  //users can delete their own account and super admins can delete any account
+  if (req.params.id !== req.user.id && req.user.role !== Role.SuperAdmin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
+  const user = await db.User.findById(req.params.id);
+
+  if (!user) {
+    return next(new ErrorResponse('User not found!', 401));
+  }
 
   await user.remove();
-}
+
+  res.status(200).json({
+    success: true,
+    message: 'User successfully deleted!'
+  });
+
+})
 
 // helper functions
-
-async function getUser(id) {
-  if (!db.isValidId(id)) throw 'User Account not found!';
-
-  const user = await db.User.findById(id);
-
-  if (!user) throw 'User Account not found!';
-
-  return user;
-}
-
 function hash(password) {
   return bcrypt.hashSync(password, 10);
 }
