@@ -1,58 +1,106 @@
 const db = require('../utils/db.connection');
+const Role = require('../utils/role');
+const asyncHandler = require('../middlewares/async');
+const ErrorResponse = require('../utils/errorResponse');
 
-module.exports = {
-  getAll,
-  getById,
-  create,
-  update,
-  delete: _delete,
-};
+exports.getProducts = asyncHandler(async (req, res, next) => {
 
-async function getAll() {
-  const products = await db.Product.find();
+  if (req.params.storeId) {
+    //TO DO: add paginations IF listing products of a store
+    const products = await db.Product.find({ store: req.params.storeId });
 
-  return products.map((x) => basicDetails(x));
-}
-
-async function getById(id) {
-  const product = await getProduct(id);
-
-  return basicDetails(product);
-}
-
-async function create(params) {
-  // might have to refactor the validation
-  if (await db.Product.findOne({ sku: params.sku })) {
-    throw 'Product with SKU of "' + params.sku + '" already exist!';
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products
+    });
+  } else {
+    res.status(200).json(res.advancedResults);
   }
 
-  const product = new db.Product(params);
+});
+
+exports.getProduct = asyncHandler(async (req, res, next) => {
+  const product = await db.Product.findById(req.params.id).populate({
+    path: 'store',
+    select: 'name description'
+  });
+
+  if (!product) {
+    return next(new ErrorResponse(`Product with id of ${req.params.id} is not found!`, 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: product
+  });
+
+});
+
+exports.createProduct = asyncHandler(async (req, res, next) => {
+  // TO DO: only admins of a store will be able to create a product
+  
+
+  // might have to refactor the validation
+  if (await db.Product.findOne({ sku: req.body.sku })) {
+    return next(new ErrorResponse(`Product with SKU of ${req.body.sku} already exist`, 400));
+  }
+
+  const product = new db.Product(req.body);
 
   await product.save();
 
-  return basicDetails(product);
-}
+  res.status(201).json({
+    success: true,
+    data: basicDetails(product)
+  })
 
-async function update(id, params) {
-  const product = await getProduct(id);
-  // might have to refactor the validation
-  if (product.sku !== params.sku && (await db.Product.findOne({ sku: params.sku }))) {
-    throw 'Product with SKU of"' + params.sku + '" already exist!';
+});
+
+exports.updateProduct = asyncHandler(async (req, res, next) => {
+
+  //user with role of 'Admin' and 'SuperdAdmin' are allowed to update products
+  if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  Object.assign(product, params);
+  const product = await db.Product.findById(req.params.id);
+
+  if (!product) {
+    return next(new ErrorResponse(`Product of id of ${req.params.id} not found`, 401));
+  }
+
+  Object.assign(product, req.body);
   product.updated = Date.now();
 
   await product.save();
 
-  return basicDetails(product);
-}
+  res.status(200).json({
+    succes: true,
+    data: basicDetails(product)
+  });
 
-async function _delete(id) {
-  const product = await getProduct(id);
+});
+
+exports.deleteProduct = asyncHandler(async (req, res, next) => {
+  //user with role of 'Admin' and 'SuperdAdmin' are allowed to delete products
+  if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
+  const product = await db.Product.findById(req.params.id);
+
+  if (!product) {
+    return next(new ErrorResponse(`Product of id of ${req.params.id} not found`, 401));
+  }
 
   await product.remove();
-}
+
+  res.status(200).json({
+    succes: true,
+    message: 'Product deleted successfully!'
+  })
+});
 
 //helper functions
 function basicDetails(product) {
@@ -65,6 +113,7 @@ function basicDetails(product) {
     price,
     weight,
     category,
+    store,
     created,
     updated,
     inStock,
@@ -79,18 +128,9 @@ function basicDetails(product) {
     price,
     weight,
     category,
+    store,
     created,
     updated,
     inStock,
   };
-}
-
-async function getProduct(id) {
-  if (!db.isValidId(id)) throw 'Product not found!';
-
-  const product = await db.Product.findById(id);
-
-  if (!product) throw 'Product not found!';
-
-  return product;
 }

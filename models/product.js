@@ -12,6 +12,10 @@ const schema = new Schema({
   stock: { type: Number, require: true },
   created: { type: Date, default: Date.now },
   updated: Date,
+  store: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Store'
+  }
 });
 
 schema.virtual('inStock').get(function () {

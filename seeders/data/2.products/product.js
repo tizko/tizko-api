@@ -16,6 +16,7 @@ for (let i = 0; i < 10; i++) {
     stock: faker.random.number(),
     created: faker.date.past(),
     updated: faker.date.recent(),
+    store: new ObjectId('5f68d23709787424cfa4950a')
   };
 
   // data.push(product);

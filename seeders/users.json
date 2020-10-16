@@ -1,0 +1,23 @@
+[{
+  "_id": {
+    "$oid": "5f60848602845e06d09b1270"
+  },
+  "firstName": "Super",
+  "lastName": "Admin",
+  "email": "superadmin@tizko.com",
+  "passwordHash": "$2a$10$BYxp.ZOyLJE0fN3CSIXSm.u66a9Pl8tgvvJ6lnVG.mryrcC5WraC.",
+  "role": "SuperAdmin",
+  "acceptTerms": true,
+  "contactNumber": "+639890611250",
+  "shippingAddress": "Unit 2 Rocklife Apartments, 217 Amparo Drive, Camp 7, Baguio City",
+  "billingAddress": "Unit 2 Rocklife Apartments, 217 Amparo Drive, Camp 7, Baguio City",
+  "verified": {
+    "$date": "2020-01-15T06:09:59.443Z"
+  },
+  "created": {
+    "$date": "2019-12-16T18:28:47.565Z"
+  },
+  "updated": {
+    "$date": "2020-09-23T06:55:58Z"
+  }
+}]
