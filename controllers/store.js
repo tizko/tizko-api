@@ -25,7 +25,9 @@ exports.getStore = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  const store = await db.Store.findById(req.params.id);
+  const store = await db.Store.findById(req.params.id).populate('products');
+
+  console.log(store);
 
   if (!store) {
     return next(
@@ -33,9 +35,10 @@ exports.getStore = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // res.status(200).json(res.advancedResults);
   res.status(200).json({
     success: true,
-    data: basicDetails(store),
+    data: store,
   });
 });
 
@@ -56,7 +59,7 @@ exports.createStore = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    data: basicDetails(store)
+    data: store
   })
 })
 

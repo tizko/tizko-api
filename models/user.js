@@ -32,9 +32,11 @@ schema.set('toJSON', {
   versionKey: false,
   transform: function (doc, ret) {
     //remove this props when object is serialized
-    delete ret._id;
     delete ret.passwordHash;
   },
 });
+
+// remove extra id when object is returned
+// schema.set('id', false);
 
 module.exports = mongoose.model('User', schema);

@@ -8,7 +8,7 @@ module.exports = [
     firstName: 'Patrick',
     lastName: 'Castro',
     email: 'ppcc@tizko.com',
-    passwordHash: bcrypt.hashSync('superadmin', 10),
+    passwordHash: bcrypt.hashSync('password', 10),
     role: 'Admin',
     acceptTerms: true,
     contactNumber: faker.phone.phoneNumber('+639#########'),
@@ -24,7 +24,22 @@ module.exports = [
     firstName: 'Karl',
     lastName: 'Balagtey',
     email: 'kmb@tizko.com',
-    passwordHash: bcrypt.hashSync('superadmin', 10),
+    passwordHash: bcrypt.hashSync('password', 10),
+    role: 'Admin',
+    acceptTerms: true,
+    contactNumber: faker.phone.phoneNumber('+639#########'),
+    shippingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    billingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    verified: faker.date.past(),
+    created: faker.date.past(),
+    updated: faker.date.recent()
+  },
+  {
+    _id: new ObjectId('5c8a1d5b0190b214360dc031'),
+    firstName: 'Pauline',
+    lastName: 'Castro',
+    email: 'pmcc@tizko.com',
+    passwordHash: bcrypt.hashSync('password', 10),
     role: 'Customer',
     acceptTerms: true,
     contactNumber: faker.phone.phoneNumber('+639#########'),
@@ -33,5 +48,21 @@ module.exports = [
     verified: faker.date.past(),
     created: faker.date.past(),
     updated: faker.date.recent()
-  }
+  },
+  {
+    _id: new ObjectId('5c8a1d5b0190b214360dc032'),
+    firstName: 'Raphael',
+    lastName: 'Castro',
+    email: 'rcc@tizko.com',
+    passwordHash: bcrypt.hashSync('password', 10),
+    role: 'Customer',
+    acceptTerms: true,
+    contactNumber: faker.phone.phoneNumber('+639#########'),
+    shippingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    billingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    verified: faker.date.past(),
+    created: faker.date.past(),
+    updated: faker.date.recent()
+  },
+
 ]

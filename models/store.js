@@ -15,6 +15,25 @@ const schema = new Schema({
   ],
   created: { type: Date, default: Date.now },
   updated: Date,
+},{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+  id: false
+});
+
+// Cascade delete products when a store is deleted
+schema.pre('remove', async function(next) {
+  console.log(`Products being removed from store ${this._id}`);
+  await this.model('Product').deleteMany({ store: this._id });
+  next();
+});
+
+// revese populate with virtuals
+schema.virtual('products', {
+  ref: 'Product',
+  localField: '_id',
+  foreignField: 'store',
+  justOne: false
 });
 
 module.exports = mongoose.model('Store', schema);

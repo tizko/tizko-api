@@ -9,6 +9,7 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "SM City Baguio Luneta Hill, Upper Session Rd, Baguio, 2600 Benguet",
+    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -19,6 +20,7 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Camp 7 Kennon Road, Baguio City, 2600 Benguet",
+    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -28,7 +30,8 @@ module.exports = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
-    location: "Cooyeesan Hotel Plaza, Naguilian corner Asin Roads, Baguio City 2600",
+    location: "Cooyeesan Hotel Plaza, Naguilian corner Asin Road  s, Baguio City 2600",
+    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -39,6 +42,7 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Prime Hotel, F. Calderon Street, Baguio City, Benguet 2600",
+    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -49,6 +53,7 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Harrison Rd., Baguio City, Benguet 2600",
+    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
     created: faker.date.past(),
     updated: faker.date.recent()
   }

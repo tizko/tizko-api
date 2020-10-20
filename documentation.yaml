@@ -5,11 +5,11 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:4000
+  - url: http://localhost:4000/api/v1
     description: Local development server
 
 paths:
-  /users/authenticate:
+  /auth/login:
     post:
       summary: Authenticate user credentials and return a JWT token and a cookie with a refresh token
       description: Users must be verified before authenticating.
