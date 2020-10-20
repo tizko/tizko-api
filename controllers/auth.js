@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const sendEmail = require('../utils/send-email');
 const db = require('../utils/db.connection');
+const Role = require('../utils/role');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -39,6 +40,10 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
   const refreshToken = await getRefreshToken(token);
   const { user } = refreshToken;
 
+  if (!refreshToken || !refreshToken.isActive) {
+    return next(new ErrorResponse('Invalid Token!', 400));
+  }
+
   //replace old refresh token with the new one and save
   const newRefreshToken = generateRefreshToken(user, ipAddress);
 
@@ -62,19 +67,10 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 exports.revokeToken = asyncHandler(async (req, res, next) => {
-  // accept token from request body or cookie
-  // TO DO: do not use jwt token
-  const token = req.body.token;
+  const token = req.body.token || req.cookies.refreshToken;
   const ipAddress = req.ip;
 
-  const refreshToken = await getRefreshToken(token);
-
-  // revoke and save
-  refreshToken.revoked = Date.now();
-  refreshToken.revokeByIp = ipAddress;
-  await refreshToken.save();
-
-  if(req.body.token || req.cookies.refreshToken) {
+  if (!token) {
     return next(new ErrorResponse('Token is required!', 400));
   }
 
@@ -83,10 +79,21 @@ exports.revokeToken = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
+  const refreshToken = await getRefreshToken(token);
+
+  if (!refreshToken || !refreshToken.isActive) {
+    return next(new ErrorResponse('Invalid Token!', 400));
+  }
+
+  //revoke and save
+  refreshToken.revoked = Date.now(),
+  refreshToken.revokeByIp = ipAddress;
+  await refreshToken.save();
+
   res.status(200).json({
     success: true,
     message: 'Token revoked!'
-  })
+  });
 });
 
 exports.register = asyncHandler(async (req, res, next) => {
@@ -229,17 +236,13 @@ const setTokenCookie = (res, token) => {
   res.cookie('refreshToken', token, cookieOptions);
 }
 
-const getRefreshToken = asyncHandler(async (token) => {
+const getRefreshToken = async (token) => {
   const refreshToken = await db.RefreshToken.findOne({ token }).populate(
     'user'
   );
 
-  if (!refreshToken || !refreshToken.isActive) {
-    return new(new ErrorResponse('Invalid Token!', 401));
-  }
-
   return refreshToken;
-});
+}
 
 const hash = (password) => {
   return bcrypt.hashSync(password, 10);
