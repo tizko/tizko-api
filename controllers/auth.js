@@ -63,7 +63,8 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
 
 exports.revokeToken = asyncHandler(async (req, res, next) => {
   // accept token from request body or cookie
-  const token = req.body.token || req.cookies.refreshToken;
+  // TO DO: do not use jwt token
+  const token = req.body.token;
   const ipAddress = req.ip;
 
   const refreshToken = await getRefreshToken(token);
@@ -73,7 +74,7 @@ exports.revokeToken = asyncHandler(async (req, res, next) => {
   refreshToken.revokeByIp = ipAddress;
   await refreshToken.save();
 
-  if(!token) {
+  if(req.body.token || req.cookies.refreshToken) {
     return next(new ErrorResponse('Token is required!', 400));
   }
 
@@ -192,6 +193,26 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: 'Password reset successful, you can now login.'
+  });
+
+});
+
+exports.validateResetToken = asyncHandler(async (req, res, next) => {
+
+  const { token } = req.body;
+  
+  const user = await db.User.findOne({
+    'resetToken.token': token,
+    'resetToken.expires': { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid Token!', 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Token is valid!'
   });
 
 });
