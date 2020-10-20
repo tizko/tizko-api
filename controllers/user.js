@@ -10,6 +10,10 @@ exports.createUser = asyncHandler(async(req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
+  //TO DO:
+  //sends an email to newly created user
+  //email contains random password with instructions to update password
+
   //check if user already exists
   if (await db.User.findOne({ email: req.body.email })) {
     return next(new ErrorResponse('User already exist!'));
@@ -35,17 +39,20 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  const users = await db.User.find();
+  res.status(200).json(res.advancedResults);
 
-  res.status(200).json({
-    success: true,
-    count: users.length,
-    data: users.map((x) => basicDetails(x))
-  });
+  // const users = await db.User.find();
+
+  // res.status(200).json({
+  //   success: true,
+  //   count: users.length,
+  //   data: users.map((x) => basicDetails(x))
+  // });
 
 });
 
 exports.getUser = asyncHandler(async (req, res, next) => {
+  //TO DO: check if what store is the user admin to
   //users can get their own account and SuperAdmins can get any account
   if (req.params.id !== req.user.id && req.user.role !== Role.SuperAdmin) {
     return next(new ErrorResponse('Unauthorized!', 401));
