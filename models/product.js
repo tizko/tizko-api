@@ -18,6 +18,15 @@ const schema = new Schema({
   }
 });
 
+schema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    //remove this props when object is serialized
+    delete ret._id;
+  },
+});
+
 schema.virtual('inStock').get(function () {
   return this.stock !== 0;
 });

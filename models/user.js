@@ -32,6 +32,7 @@ schema.set('toJSON', {
   versionKey: false,
   transform: function (doc, ret) {
     //remove this props when object is serialized
+    delete ret._id;
     delete ret.passwordHash;
   },
 });

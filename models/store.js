@@ -15,10 +15,24 @@ const schema = new Schema({
   ],
   created: { type: Date, default: Date.now },
   updated: Date,
-},{
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true },
-  id: false
+});
+
+schema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    //remove this props when object is serialized
+    delete ret._id;
+  },
+});
+
+schema.set('toObject', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    //remove this props when object is serialized
+    delete ret._id;
+  },
 });
 
 // Cascade delete products when a store is deleted
