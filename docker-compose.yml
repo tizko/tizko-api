@@ -1,0 +1,45 @@
+version: '3.8'
+
+# connectionString: "mongodb+srv://kmarkb8017:Proverbs356@cluster0-c2wsd.mongodb.net/tizko?authSource=admin&replicaSet=Cluster0-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true",
+
+services:
+
+    # Backend API
+    tizko-api:
+        container_name: backend
+        build: ./
+        command: npm start
+        working_dir: /usr/src/tizko-api
+        environment:
+            MONGO_URI: mongodb+srv://kmarkb8017:Proverbs356@cluster0-c2wsd.mongodb.net/tizko?authSource=admin&replicaSet=Cluster0-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true
+            # POSTGRES_URI: postgres://karl:secret@postgres:5432/tizko-docker
+            # REDIS_URI: redis://redis:6379
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./:/usr/src/tizko-api
+
+    # MongoDB
+    mongodb:
+        image: "mongo:latest"
+        ports:
+            - "27017:27017"
+
+    # Postgres
+    # postgres:
+    #     environment:
+    #         POSTGRES_USER: karl
+    #         POSTGRES_PASSWORD: secret
+    #         POSTGRES_DB: tizko-docker
+    #         POSTGRES_HOST: postgres
+
+    #     # Build from postgres folder
+    #     build: ./postgres
+    #     ports:
+    #         - "5432:5432"
+
+    # Redis
+    # redis:
+    #     image: redis
+    #     ports:
+    #         - "6379:6379"

@@ -5,7 +5,6 @@ exports.createSchema = (req, res, next) =>{
   const schema = Joi.object({
     name: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required(),
     location: Joi.string().required(),
     contactNumber: Joi.string().required()
   });
@@ -17,7 +16,6 @@ exports.updateSchema = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().empty(''),
     description: Joi.string().empty(''),
-    image: Joi.string().empty(''),
     location: Joi.string().empty(''),
     contactNumber: Joi.string().empty('')
   });

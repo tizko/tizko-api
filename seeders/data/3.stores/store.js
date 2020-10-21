@@ -10,6 +10,7 @@ module.exports = [
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "SM City Baguio Luneta Hill, Upper Session Rd, Baguio, 2600 Benguet",
     admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5c8a1d5b0190b214360dc032")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -21,6 +22,7 @@ module.exports = [
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Camp 7 Kennon Road, Baguio City, 2600 Benguet",
     admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5c8a1d5b0190b214360dc032")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -32,6 +34,7 @@ module.exports = [
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Cooyeesan Hotel Plaza, Naguilian corner Asin Road  s, Baguio City 2600",
     admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5c8a1d5b0190b214360dc032")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -43,6 +46,7 @@ module.exports = [
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Prime Hotel, F. Calderon Street, Baguio City, Benguet 2600",
     admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5c8a1d5b0190b214360dc032")],
     created: faker.date.past(),
     updated: faker.date.recent()
   },
@@ -53,7 +57,8 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Harrison Rd., Baguio City, Benguet 2600",
-    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    admins: [new ObjectId("5f8fefcdc3e019936e1fc7b7"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5f8fefd60488fc06f488a533")],
     created: faker.date.past(),
     updated: faker.date.recent()
   }
