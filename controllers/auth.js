@@ -283,6 +283,7 @@ const basicDetails = (user) => {
     created,
     updated,
     isVerified,
+    store,
   } = user;
   return {
     id,
@@ -296,6 +297,7 @@ const basicDetails = (user) => {
     created,
     updated,
     isVerified,
+    store,
   };
 }
 
