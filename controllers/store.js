@@ -25,11 +25,7 @@ exports.getStore = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  console.log(req.params);
-
   const store = await db.Store.findById(req.params.id).populate('products');
-
-  console.log(store);
 
   if (!store) {
     return next(
