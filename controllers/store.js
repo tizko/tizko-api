@@ -27,8 +27,6 @@ exports.getStore = asyncHandler(async (req, res, next) => {
 
   const store = await db.Store.findById(req.params.id).populate('products');
 
-  console.log(store);
-
   if (!store) {
     return next(
       new ErrorResponse(`Store with ID of ${req.params.id} is not found!`, 404)
