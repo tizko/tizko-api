@@ -40,6 +40,28 @@ exports.getStore = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.getStoreCustomers = asyncHandler(async (req, res, next) => {
+  //user with role of 'Admin' and 'SuperAdmin' can get store details
+  //TO DO: check if the user is a admin of store
+  if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
+  const store = await db.Store.findById(req.params.storeId).where('admins').in(req.params.userId).populate('customers').exec();
+
+  if (!store) {
+    return next(
+      new ErrorResponse(`Store or User Id is invalid!`, 404)
+    );
+  }
+
+  // res.status(200).json(res.advancedResults);
+  res.status(200).json({
+    success: true,
+    data: store,
+  });
+});
+
 exports.createStore = asyncHandler(async (req, res, next) => {
   // only SuperAdmins can create a store
   if (req.user.role !== Role.SuperAdmin) {

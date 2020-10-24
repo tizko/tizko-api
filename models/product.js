@@ -13,7 +13,7 @@ const schema = new Schema({
   created: { type: Date, default: Date.now },
   updated: Date,
   store: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Store'
   }
 });

@@ -20,6 +20,10 @@ const schema = new Schema({
   passwordReset: Date,
   created: { type: Date, default: Date.now },
   updated: Date,
+  store: {
+    type: Schema.Types.ObjectId,
+    ref: 'Store'
+  }
 });
 
 //will be used in email verification
