@@ -3,12 +3,12 @@ const validateRequest = require('../middlewares/validate-request');
 
 exports.createSchema = (req, res, next) => {
   const schema = Joi.object({
-    sku: Joi.string().required(),
+    sku: Joi.string(),
     name: Joi.string().required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
-    weight: Joi.number().required(),
-    category: Joi.string().required(),
+    weight: Joi.number(),
+    category: Joi.string(),
     stock: Joi.number().required(),
   });
 

@@ -9,7 +9,7 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "SM City Baguio Luneta Hill, Upper Session Rd, Baguio, 2600 Benguet",
-    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35"), new ObjectId("5f8fefcdc3e019936e1fc7b7")],
     customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5c8a1d5b0190b214360dc032")],
     created: faker.date.past(),
     updated: faker.date.recent()
@@ -33,7 +33,7 @@ module.exports = [
     image: "http://image.com",
     contactNumber: faker.phone.phoneNumber('+639#########'),
     location: "Cooyeesan Hotel Plaza, Naguilian corner Asin Road  s, Baguio City 2600",
-    admins: [new ObjectId("5efec5f82516e36a501ceaaa"), new ObjectId("5efea341cb4e4c61fafb8c35")],
+    admins: [new ObjectId("5f939a21ac616e20f87c0d61"), new ObjectId("5efea341cb4e4c61fafb8c35")],
     customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5c8a1d5b0190b214360dc032")],
     created: faker.date.past(),
     updated: faker.date.recent()
@@ -61,6 +61,17 @@ module.exports = [
     customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5f8fefd60488fc06f488a533")],
     created: faker.date.past(),
     updated: faker.date.recent()
+  },
+  {
+    _id: new ObjectId("5f9399ddc8f4a5f11148b880"),
+    name: "Robinsons Supermarket",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+    image: "http://image.com",
+    contactNumber: faker.phone.phoneNumber('+639#########'),
+    location: "Holyspirit Rd., Quezon City",
+    admins: [new ObjectId("5f9399caca9b77ef5e75fef4")],
+    customers: [new ObjectId("5c8a1d5b0190b214360dc031"), new ObjectId("5f8fefd60488fc06f488a533")],
+    created: faker.date.past(),
+    updated: faker.date.recent()
   }
 ]
-

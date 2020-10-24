@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-  sku: { type: String, require: true },
+  sku: { type: String },
   name: { type: String, require: true },
   description: { type: String, require: true },
-  image: { type: Array, require: true },
+  image: { type: Array },
   price: { type: Number, require: true },
-  weight: { type: Number, require: true },
+  weight: { type: Number },
   category: { type: String },
   stock: { type: Number, require: true },
   created: { type: Date, default: Date.now },

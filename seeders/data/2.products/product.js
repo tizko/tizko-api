@@ -4,7 +4,7 @@ const ObjectId = require('mongodb').ObjectID;
 let data = [];
 
 // create 10 products for store 1
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1000; i++) {
   let store1 = {
     _id: new ObjectId(),
     sku: faker.finance.iban(),
@@ -24,7 +24,7 @@ for (let i = 0; i < 10; i++) {
   data = [...data, store1];
 }
 // create 10 products for store 2
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 800; i++) {
   let store2 = {
     _id: new ObjectId(),
     sku: faker.finance.iban(),
@@ -45,7 +45,7 @@ for (let i = 0; i < 10; i++) {
 }
 
 // create 10 products for store 3
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1000; i++) {
   let store3 = {
     _id: new ObjectId(),
     sku: faker.finance.iban(),
@@ -66,7 +66,7 @@ for (let i = 0; i < 10; i++) {
 }
 
 // create 10 products for store 4
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 5000; i++) {
   let store4 = {
     _id: new ObjectId(),
     sku: faker.finance.iban(),
@@ -87,7 +87,7 @@ for (let i = 0; i < 10; i++) {
 }
 
 // create 10 products for store 5
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 2900; i++) {
   let store5 = {
     _id: new ObjectId(),
     sku: faker.finance.iban(),

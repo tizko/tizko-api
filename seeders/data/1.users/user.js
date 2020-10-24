@@ -69,7 +69,7 @@ module.exports = [
     _id: new ObjectId('5f8fefcdc3e019936e1fc7b7'),
     firstName: 'Kilo',
     lastName: 'Man',
-    email: 'admin@tizko.com',
+    email: 'admin@sm.com.ph',
     passwordHash: bcrypt.hashSync('password', 10),
     role: 'Admin',
     acceptTerms: true,
@@ -78,13 +78,46 @@ module.exports = [
     billingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
     verified: faker.date.past(),
     created: faker.date.past(),
-    updated: faker.date.recent()
+    updated: faker.date.recent(),
+    store: new ObjectId('5f68d23709787424cfa4950a')
+  },
+  {
+    _id: new ObjectId('5f9399caca9b77ef5e75fef4'),
+    firstName: 'Eurich',
+    lastName: 'De Guzman',
+    email: 'admin@robinsons.com.ph',
+    passwordHash: bcrypt.hashSync('password', 10),
+    role: 'Admin',
+    acceptTerms: true,
+    contactNumber: faker.phone.phoneNumber('+639#########'),
+    shippingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    billingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    verified: faker.date.past(),
+    created: faker.date.past(),
+    updated: faker.date.recent(),
+    store: new ObjectId('5f9399ddc8f4a5f11148b880')
+  },
+  {
+    _id: new ObjectId('5f939a21ac616e20f87c0d61'),
+    firstName: 'Erick',
+    lastName: 'Ducusin',
+    email: 'admin@puregold.com.ph',
+    passwordHash: bcrypt.hashSync('password', 10),
+    role: 'Admin',
+    acceptTerms: true,
+    contactNumber: faker.phone.phoneNumber('+639#########'),
+    shippingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    billingAddress: faker.address.streetAddress() + ', ' + faker.address.city() + ', ' + faker.address.country(),
+    verified: faker.date.past(),
+    created: faker.date.past(),
+    updated: faker.date.recent(),
+    store: new ObjectId('5f7d0c7030268f70e90db920')
   },
   {
     _id: new ObjectId('5f8fefd60488fc06f488a533'),
     firstName: 'Victor',
     lastName: 'Magtanggol',
-    email: 'victor@tizko.com',
+    email: 'customer@tizko.com',
     passwordHash: bcrypt.hashSync('password', 10),
     role: 'Customer',
     acceptTerms: true,
@@ -94,7 +127,5 @@ module.exports = [
     verified: faker.date.past(),
     created: faker.date.past(),
     updated: faker.date.recent()
-  },
-
-  
+  }
 ]
