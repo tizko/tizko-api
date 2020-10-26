@@ -21,7 +21,7 @@ exports.getStores = asyncHandler(async (req, res, next) => {
 exports.getStore = asyncHandler(async (req, res, next) => {
   //user with role of 'Admin' and 'SuperAdmin' can get store details
   //TO DO: check if the user is a admin of store
-  if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
+  if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) || !(store.admins.includes(req.user.id))) {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
@@ -43,7 +43,7 @@ exports.getStore = asyncHandler(async (req, res, next) => {
 exports.getStoreCustomers = asyncHandler(async (req, res, next) => {
   //user with role of 'Admin' and 'SuperAdmin' can get store details
   //TO DO: check if the user is a admin of store
-  if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
+  if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) || !(store.admins.includes(req.user.id))) {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 

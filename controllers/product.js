@@ -43,7 +43,6 @@ exports.createProduct = asyncHandler(async (req, res, next) => {
   const store = await db.Store.findById(req.params.storeId);
 
   //user with role of 'Admin' and 'SuperdAdmin' are allowed to update products
-  // TO DO: check if user is admin of store
   if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) || !(store.admins.includes(req.user.id))) {
     return next(new ErrorResponse('Unauthorized!', 401));
   }

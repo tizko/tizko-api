@@ -15,6 +15,7 @@ module.exports = {
   RefreshToken: require('../models/Refresh-Token'),
   Product: require('../models/Product'),
   Store: require('../models/Store'),
+  Order: require('../models/order'),
   isValidId
 }
 
