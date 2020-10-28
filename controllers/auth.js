@@ -25,7 +25,7 @@ exports.authenticate = asyncHandler(async (req, res, next) => {
   await refreshToken.save();
 
   //set refresh token as cookie
-  setTokenCookie(res, refreshToken.token);
+  setTokenCookie(res, refreshToken.token, user);
 
   //return basic user details and access token
   res.status(200).json({
@@ -35,7 +35,15 @@ exports.authenticate = asyncHandler(async (req, res, next) => {
 });
 
 exports.refreshToken = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.refreshToken;
+  let token;
+  if (req.body.role === 'SuperAdmin') {
+    token = req.cookies.SrefreshToken;    
+  } else if (req.body.role === 'Admin') {
+    token = req.cookies.ArefreshToken;
+  } else {
+    token = req.cookies.CrefreshToken;
+  }
+
   const ipAddress = req.ip;
   const refreshToken = await getRefreshToken(token);
   const { user } = refreshToken;
@@ -58,7 +66,7 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
   const jwtToken = generateJwtToken(user);
 
   //set cookie as the new generated refreshtoken
-  setTokenCookie(res, newRefreshToken.token);
+  setTokenCookie(res, newRefreshToken.token, user);
 
   res.status(200).json({
     ...basicDetails(user),
@@ -226,14 +234,21 @@ exports.validateResetToken = asyncHandler(async (req, res, next) => {
 
 //helper functions
 
-const setTokenCookie = (res, token) => {
+const setTokenCookie = (res, token, user) => {
   //create cookie with refresh token that expires in 7 days
   const cookieOptions = {
     httpOnly: true,
     expires: new Date(Date.now() + 7 + 24 * 60 * 60 * 1000),
   };
+  console.log(user);
+  if (user.role === 'SuperAdmin') {
+    res.cookie('SrefreshToken', token, cookieOptions);
+  } else if (user.role === 'Admin') {
+    res.cookie('ArefreshToken', token, cookieOptions);
+  } else {
+    res.cookie('CrefreshToken', token, cookieOptions);
+  }
 
-  res.cookie('refreshToken', token, cookieOptions);
 }
 
 const getRefreshToken = async (token) => {
