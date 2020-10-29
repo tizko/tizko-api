@@ -31,6 +31,13 @@ schema.virtual('isVerified').get(function () {
   return !!(this.verified || this.passwordReset);
 });
 
+schema.virtual('myStore', {
+  ref: 'Store',
+  localField: '_id',
+  foreignField: 'admins',
+  justOne: false
+});
+
 schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
@@ -41,7 +48,14 @@ schema.set('toJSON', {
   },
 });
 
-// remove extra id when object is returned
-// schema.set('id', false);
+schema.set('toObject', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    //remove this props when object is serialized
+    delete ret._id;
+    delete ret.passwordHash;
+  },
+});
 
 module.exports = mongoose.model('User', schema);

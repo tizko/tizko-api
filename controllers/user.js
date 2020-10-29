@@ -4,7 +4,22 @@ const Role = require('../utils/role');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 
-exports.createUser = asyncHandler(async(req, res, next) => {
+exports.getCurrent = asyncHandler(async (req, res, next) => {
+
+  const user = await db.User.findById(req.user.id).populate('store');
+
+  if (!user) {
+    return next(new ErrorResponse('User not found!', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: basicDetails(user)
+  });
+
+});
+
+exports.createUser = asyncHandler(async (req, res, next) => {
   // only user with the role of SuperAdmin can create users
   if (req.user.role !== Role.SuperAdmin) {
     return next(new ErrorResponse('Unauthorized!', 401));
@@ -61,7 +76,7 @@ exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await db.User.findById(req.params.id);
 
   if (!user) {
-    return next(new ErrorResponse('User not found!', 4040));
+    return next(new ErrorResponse('User not found!', 404));
   }
 
   res.status(200).json({
@@ -141,6 +156,7 @@ function basicDetails(user) {
     shippingAddress,
     billingAddress,
     role,
+    store,
     created,
     updated,
     isVerified,
@@ -151,6 +167,7 @@ function basicDetails(user) {
     lastName,
     email,
     role,
+    store,
     contactNumber,
     shippingAddress,
     billingAddress,

@@ -3,60 +3,88 @@ const Role = require('../utils/role');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 
+exports.createOrder = asyncHandler(async (req, res, next) => {
+  req.body.customer = req.user.id;
+
+  const order = await db.Order.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    data: order
+  });
+
+});
+
 exports.getOrders = asyncHandler(async (req, res, next) => {
-  //user with role of 'Admin' and 'SuperAdmin' can get store details
-  //TO DO: check if the user is a admin of store
+  const orders = await db.Order.find({ customer: req.user.id }).populate('products.product');
+
+  res.status(200).json({
+    success: true,
+    data: orders
+  })
+});
+
+exports.getOrder = asyncHandler(async (req, res, next) => {
+
+  const order = await db.Order.findById(req.params.id).populate('products.product');
+
+  //check if user is owner of order
+  if (order.customer != req.user.id) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
+  if (!order) {
+    return next(new ErrorResponse('Order not found!', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: order
+  });
+
+});
+
+exports.updateOrder = asyncHandler(async (req, res, next) => {
+
+  const order = await db.Order.findById(req.params.id);
+
+  //check if user is admin
   if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  const orders = await db.Order.findById(req.params.id).populate('customer');
-
-  if (req.params.id) {
-
-    return res.status(200).json({
-      success: true,
-      count: orders.length,
-      data: orders
-    });
-  } else {
-    res.status(200).json(res.advancedResults);
+  if (!order) {
+    return next(new ErrorResponse('Order not found!', 404));
   }
+
+  Object.assign(order, req.body);
+  order.updated = Date.now();
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    data: order
+  });
 });
 
-exports.createProduct = asyncHandler(async (req, res, next) => {
-    req.body.store = req.params.storeId;
+exports.deleteOrder = asyncHandler(async (req, res, next) => {
+
+  //check if user is admin
+  if (req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
   
-    const store = await db.Store.findById(req.params.storeId);
-    console.log(req.user.id);
-    console.log(req.body);
-  
-    //user with role of 'Admin' and 'SuperdAdmin' are allowed to update products
-    // TO DO: check if user is admin of store
-    if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) || !(store.admins.includes(req.user.id))) {
-      return next(new ErrorResponse('Unauthorized!', 401));
-    }
-  
-    // if (!(store.admins.includes(req.user.id))) {
-    //   return next(new ErrorResponse('Unauthorized!', 401));
-    // }
-    // check if store exist
-    if (!store) {
-      return next(new ErrorResponse(`Store with ID of ${req.params.storeId} does not exist!`, 404));
-    }
-  
-    // might have to refactor the validation
-    if (await db.Product.findOne({ sku: req.body.sku })) {
-      return next(new ErrorResponse(`Product with SKU of ${req.body.sku} already exist`, 400));
-    }
-    
-    const product = new db.Product(req.body);
-  
-    await product.save();
-  
-    res.status(201).json({
-      success: true,
-      data: product
-    })
-  
-  });
+  const order = await db.Order.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorResponse(`Order of id of ${req.params.id} not found`, 401));
+  }
+
+  await order.remove();
+
+  res.status(200).json({
+    succes: true,
+    message: 'Order deleted successfully!'
+  })
+});
