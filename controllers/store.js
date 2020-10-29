@@ -9,23 +9,25 @@ exports.getStores = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
-  res.status(200).json(res.advancedResults);
+  const stores = await db.Store.find();
 
-  // res.status(200).json({
-  //   success: true,
-  //   count: stores.length,
-  //   data: stores,
-  // });
+  // res.status(200).json(res.advancedResults);
+
+  res.status(200).json({
+    success: true,
+    count: stores.length,
+    data: stores.map((x) => basicDetails(x)),
+  });
 });
 
 exports.getStore = asyncHandler(async (req, res, next) => {
+
+  const store = await db.Store.findById(req.params.id).populate('products');
   //user with role of 'Admin' and 'SuperAdmin' can get store details
   //TO DO: check if the user is a admin of store
   if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) || !(store.admins.includes(req.user.id))) {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
-
-  const store = await db.Store.findById(req.params.id).populate('products');
 
   if (!store) {
     return next(
@@ -135,3 +137,9 @@ const basicDetails = (store) => {
 
   return { id, name, description, image, location, contactNumber };
 }
+
+// function basicDetails(store) {
+//   const { id, name, description, image, location, contactNumber} = store;
+
+//   return { id, name, description, image, location, contactNumber };
+// }

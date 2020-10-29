@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const authorize = require('../middlewares/authorize');
-const db = require('../utils/db.connection');
 const { createOrder, getOrders, getOrder, updateOrder, deleteOrder } = require('../controllers/order');
 
 router.route('/')
