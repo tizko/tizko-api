@@ -10,6 +10,7 @@ const schema = new Schema({
   weight: { type: Number, require: true },
   category: { type: String },
   stock: { type: Number, require: true },
+  isPublished: { type: Boolean, default: false },
   created: { type: Date, default: Date.now },
   updated: Date,
   store: {
