@@ -36,12 +36,18 @@ exports.authenticate = asyncHandler(async (req, res, next) => {
 
 exports.refreshToken = asyncHandler(async (req, res, next) => {
   let token;
+
   if (req.body.role === 'SuperAdmin') {
     token = req.cookies.SrefreshToken;    
   } else if (req.body.role === 'Admin') {
     token = req.cookies.ArefreshToken;
   } else {
     token = req.cookies.CrefreshToken;
+  }
+
+  if (!token) {
+    console.log(token);
+    return next(new ErrorResponse('Invalid Cookies!', 400));
   }
 
   const ipAddress = req.ip;
@@ -75,7 +81,17 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 exports.revokeToken = asyncHandler(async (req, res, next) => {
-  const token = req.body.token || req.cookies.refreshToken;
+  let token;
+  const { role } = req.user;
+
+  if (role === 'SuperAdmin') {
+    token = req.cookies.SrefreshToken;    
+  } else if (role === 'Admin') {
+    token = req.cookies.ArefreshToken;
+  } else {
+    token = req.cookies.CrefreshToken;
+  }
+
   const ipAddress = req.ip;
 
   if (!token) {
@@ -89,6 +105,8 @@ exports.revokeToken = asyncHandler(async (req, res, next) => {
 
   const refreshToken = await getRefreshToken(token);
 
+  console.log(refreshToken);
+
   if (!refreshToken || !refreshToken.isActive) {
     return next(new ErrorResponse('Invalid Token!', 400));
   }
@@ -97,6 +115,14 @@ exports.revokeToken = asyncHandler(async (req, res, next) => {
   refreshToken.revoked = Date.now(),
   refreshToken.revokeByIp = ipAddress;
   await refreshToken.save();
+
+  if (role === 'SuperAdmin') {
+    res.clearCookie('SrefreshToken');    
+  } else if (role === 'Admin') {
+    res.clearCookie('ArefreshToken');
+  } else {
+    res.clearCookie('CrefreshToken');
+  }
 
   res.status(200).json({
     success: true,

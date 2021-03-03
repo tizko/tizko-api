@@ -45,11 +45,15 @@ exports.getStore = asyncHandler(async (req, res, next) => {
 exports.getStoreCustomers = asyncHandler(async (req, res, next) => {
   //user with role of 'Admin' and 'SuperAdmin' can get store details
   //TO DO: check if the user is a admin of store
-  if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin) || !(store.admins.includes(req.user.id))) {
+  if ((req.user.role !== Role.SuperAdmin && req.user.role !== Role.Admin)) {
     return next(new ErrorResponse('Unauthorized!', 401));
   }
 
   const store = await db.Store.findById(req.params.storeId).where('admins').in(req.params.userId).populate('customers').exec();
+
+  if (!(store.admins.includes(req.user.id))) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
 
   if (!store) {
     return next(
