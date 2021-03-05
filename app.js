@@ -6,15 +6,20 @@ const morgan = require('morgan');
 const colors = require('colors');
 const app = express();
 const cors = require('cors');
-// const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error-handler');
+const enforce = require('express-sslify');
 
 dotenv.config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`)});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(enforce.HTTPS({ trustProtoHeader: true }));
+}
+
 // allow cors requests from any origin and with credentials
 app.use(
   cors({
