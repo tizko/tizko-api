@@ -42,6 +42,27 @@ exports.getStore = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.searchStore = asyncHandler(async (req, res, next) => {
+  if (req.user.role !== Role.SuperAdmin) {
+    return next(new ErrorResponse('Unauthorized!', 401));
+  }
+
+  const searchTerm = req.params.term;
+  const stores = await db.Store.find({ $text: {$search: searchTerm }});
+
+  if (!stores) {
+    return next(
+      new ErrorResponse(`Store '${searchTerm}' is not found!`, 404)
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    count: stores.length,
+    data: stores.map((x) => basicDetails(x)),
+  });
+});
+
 exports.getStoreCustomers = asyncHandler(async (req, res, next) => {
   //user with role of 'Admin' and 'SuperAdmin' can get store details
   //TO DO: check if the user is a admin of store
@@ -137,9 +158,9 @@ exports.deleteStore = asyncHandler(async (req, res, next) => {
 
 //helper functions
 const basicDetails = (store) => {
-  const { id, name, description, image, location, contactNumber } = store;
+  const { id, name, description, image, location, contactNumber, created, updated } = store;
 
-  return { id, name, description, image, location, contactNumber };
+  return { id, name, description, image, location, contactNumber, created, updated };
 }
 
 // function basicDetails(store) {

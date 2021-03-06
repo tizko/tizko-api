@@ -4,7 +4,7 @@ const authorize = require('../middlewares/authorize');
 const db = require('../utils/db.connection');
 const Role = require('../utils/role');
 const { createSchema, updateSchema } = require('../validations/store.validation');
-const { getStores, getStore, getStoreCustomers, updateStore, createStore, deleteStore } = require('../controllers/store');
+const { getStores, getStore, getStoreCustomers, updateStore, createStore, deleteStore, searchStore } = require('../controllers/store');
 
 const Store = db.Store;
 
@@ -29,5 +29,6 @@ router.route('/:id')
   .delete(authorize(Role.SuperAdmin), deleteStore);
 
 router.route('/:storeId/:userId/customers').get(authorize(), getStoreCustomers);
+router.route('/search/:term').get(authorize(Role.SuperAdmin), searchStore);
 
 module.exports = router;
