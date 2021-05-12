@@ -35,7 +35,7 @@
     "mongoose": "^5.9.20",
     "mongoose-deep-populate": "^3.2.0",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.4.10",
+    "nodemailer": "^6.4.16",
     "rootpath": "^0.1.2",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
